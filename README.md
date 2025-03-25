@@ -34,6 +34,7 @@ Tracks inventory for glasses.
   - `lefteye_glass_colour` & `righteye_glass_colour`: Colors of the lenses for each eye (optional).
   - `price`: Price of the glasses.
   - `id_supplier` (Foreign Key): Reference to the supplier in the `supplier` table.
+  - `id_brand` (Foreign Key): Reference to the brands in the `brands` table.
 
 ### 4. `referral` Table
 Tracks referral sources for new clients.
@@ -73,6 +74,16 @@ Stores supplier details.
   - `address`, `city`, `postal_code`, `country`: Location details of the supplier.
   - `phone` & `fax`: Contact information for the supplier (optional).
   - `TIN`: Tax identification number (unique).
+ 
+
+### 8. `brands` Table
+Tracks referral sources for the brands that the optitian works with.
+
+- **Columns**:
+  - `id_brand` (Primary Key): Unique identifier for the brands source.
+  - `name`: Name of the brand.
+  - `id_supplier` (Foreign Key): Reference to the supplier in the `supplier` table.
+
 
 
 ## Setup
