@@ -16,6 +16,33 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `brands`
+--
+
+DROP TABLE IF EXISTS `brands`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `brands` (
+  `id_brand` int NOT NULL AUTO_INCREMENT,
+  `brand_name` varchar(100) NOT NULL,
+  `id_supplier` int NOT NULL,
+  PRIMARY KEY (`id_brand`),
+  UNIQUE KEY `unique_supplier_per_brand` (`id_supplier`),
+  CONSTRAINT `fk_brands_supplier` FOREIGN KEY (`id_supplier`) REFERENCES `supplier` (`id_supplier`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `brands`
+--
+
+LOCK TABLES `brands` WRITE;
+/*!40000 ALTER TABLE `brands` DISABLE KEYS */;
+INSERT INTO `brands` VALUES (1,'Ray-Ban',3),(2,'Oakley',2),(3,'Maui Jim',4),(4,'Etnia',1);
+/*!40000 ALTER TABLE `brands` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `clients`
 --
 
@@ -30,7 +57,7 @@ CREATE TABLE `clients` (
   `email` varchar(300) DEFAULT NULL,
   `register_date` date NOT NULL,
   `id_referral` int DEFAULT NULL,
-  `id_employee` int DEFAULT NULL,
+  `id_employee` int NOT NULL,
   PRIMARY KEY (`id_client`),
   KEY `fk_client_employee` (`id_employee`),
   KEY `fk_client_referral` (`id_referral`),
@@ -82,17 +109,18 @@ DROP TABLE IF EXISTS `glasses`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `glasses` (
   `id_glasses` int NOT NULL AUTO_INCREMENT,
-  `brand` varchar(100) NOT NULL,
-  `left_eye_measurement` decimal(4,2) DEFAULT NULL,
-  `right_eye_measurement` decimal(4,2) DEFAULT NULL,
-  `frame_type` enum('Flotant','Pasta','Metàl·lica') NOT NULL,
-  `frame_colour` varchar(30) DEFAULT NULL,
-  `lefteye_glass_colour` varchar(30) DEFAULT NULL,
-  `righteye_glass_colour` varchar(30) DEFAULT NULL,
+  `left_eye_measurement` decimal(4,2) NOT NULL,
+  `right_eye_measurement` decimal(4,2) NOT NULL,
+  `frame_colour` varchar(30) NOT NULL,
+  `lefteye_glass_colour` varchar(30) NOT NULL,
+  `righteye_glass_colour` varchar(30) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `id_supplier` int NOT NULL,
+  `id_brand` int NOT NULL,
+  `frame_type` enum('Floating','Plastic','Metal') NOT NULL,
   PRIMARY KEY (`id_glasses`),
   KEY `id_supplier` (`id_supplier`),
+  KEY `fk_glasses_brand` (`id_brand`),
   CONSTRAINT `glasses_ibfk_1` FOREIGN KEY (`id_supplier`) REFERENCES `supplier` (`id_supplier`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -103,7 +131,7 @@ CREATE TABLE `glasses` (
 
 LOCK TABLES `glasses` WRITE;
 /*!40000 ALTER TABLE `glasses` DISABLE KEYS */;
-INSERT INTO `glasses` VALUES (1,'RayBan',-2.00,-1.75,'Metàl·lica','Negre','Transparent','Transparent',150.00,1),(2,'Oakley',-1.00,-1.25,'Pasta','Blau','Blau clar','Blau clar',200.00,2),(3,'Gucci',-2.50,-2.50,'Flotant','Daurat','Vermell','Marró',180.00,1);
+INSERT INTO `glasses` VALUES (1,-2.00,-1.75,'Negre','Transparent','Transparent',150.00,1,4,'Floating'),(2,-1.00,-1.25,'Blau','Blau clar','Blau clar',200.00,2,2,'Floating'),(3,-2.50,-2.50,'Daurat','Vermell','Marró',180.00,4,3,'Floating');
 /*!40000 ALTER TABLE `glasses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -140,9 +168,9 @@ DROP TABLE IF EXISTS `sale_detail`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sale_detail` (
   `id_detail` int NOT NULL AUTO_INCREMENT,
-  `id_sale` int DEFAULT NULL,
-  `quantity` int DEFAULT NULL,
-  `price` decimal(10,2) DEFAULT NULL,
+  `id_sale` int NOT NULL,
+  `quantity` int NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id_detail`),
   KEY `fk_sale_detail_sales` (`id_sale`),
   CONSTRAINT `fk_sale_detail_sales` FOREIGN KEY (`id_sale`) REFERENCES `sales` (`id_sale`)
@@ -204,16 +232,16 @@ DROP TABLE IF EXISTS `supplier`;
 CREATE TABLE `supplier` (
   `id_supplier` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `address` varchar(50) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `postal_code` varchar(10) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(50) NOT NULL,
+  `city` varchar(100) NOT NULL,
+  `postal_code` varchar(10) NOT NULL,
+  `country` varchar(100) NOT NULL,
+  `phone` varchar(20) NOT NULL,
   `fax` varchar(20) DEFAULT NULL,
   `TIN` varchar(20) NOT NULL,
   PRIMARY KEY (`id_supplier`),
   UNIQUE KEY `TIN` (`TIN`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,7 +250,7 @@ CREATE TABLE `supplier` (
 
 LOCK TABLES `supplier` WRITE;
 /*!40000 ALTER TABLE `supplier` DISABLE KEYS */;
-INSERT INTO `supplier` VALUES (1,'Òptiques SA','c/ Gran Via, 123','Barcelona','8001','Spain','934567890','934567891','A12345678'),(2,'Ulleres Top','Rambla Nova, 45','Tarragona','43003','Spain','977223344','977223345','B98765432');
+INSERT INTO `supplier` VALUES (1,'Òptiques SA','c/ Gran Via, 123','Barcelona','8001','Spain','934567890','934567891','A12345678'),(2,'Ulleres Top','Rambla Nova, 45','Tarragona','43003','Spain','977223344','977223345','B98765432'),(3,'Opticas Visión','Carrer de Pau, 5','Madrid','28001','Spain','912345678','912345679','C12345678'),(4,'Lentes Globales','Avinguda Diagonal, 101','Barcelona','8019','Spain','933456789','933456790','D87654321');
 /*!40000 ALTER TABLE `supplier` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -235,4 +263,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-20 19:48:45
+-- Dump completed on 2025-03-25 10:19:14
